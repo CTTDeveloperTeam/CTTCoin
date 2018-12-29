@@ -1,0 +1,2 @@
+# CTTCoin
+CryptoInvest Coin
