@@ -1,0 +1,26 @@
+[Unit]
+Description=CryptoInvest's distributed currency daemon
+After=network.target
+
+[Service]
+User=cryptoinvest
+Group=cryptoinvest
+
+Type=forking
+PIDFile=/var/lib/cryptoinvestd/cryptoinvestd.pid
+
+ExecStart=/usr/bin/cryptoinvestd -daemon -pid=/var/lib/cryptoinvestd/cryptoinvestd.pid \
+          -conf=/etc/cryptoinvest/cryptoinvest.conf -datadir=/var/lib/cryptoinvestd
+
+ExecStop=-/usr/bin/cryptoinvest-cli -conf=/etc/cryptoinvest/cryptoinvest.conf \
+         -datadir=/var/lib/cryptoinvestd stop
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

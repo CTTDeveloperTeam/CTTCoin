@@ -1,0 +1,26 @@
+# /etc/conf.d/cryptoinvestd: config file for /etc/init.d/cryptoinvestd
+
+# Config file location
+#BITCOIND_CONFIGFILE="/etc/cryptoinvest/cryptoinvest.conf"
+
+# What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
+#BITCOIND_PIDDIR="/var/run/cryptoinvestd"
+
+# What filename to give the pidfile
+#BITCOIND_PIDFILE="${BITCOIND_PIDDIR}/cryptoinvestd.pid"
+
+# Where to write cryptoinvestd data (be mindful that the blockchain is large)
+#BITCOIND_DATADIR="/var/lib/cryptoinvestd"
+
+# User and group to own cryptoinvestd process
+#BITCOIND_USER="cryptoinvest"
+#BITCOIND_GROUP="cryptoinvest"
+
+# Path to cryptoinvestd executable
+#BITCOIND_BIN="/usr/bin/cryptoinvestd"
+
+# Nice value to run cryptoinvestd under
+#BITCOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+BITCOIND_OPTS=""
