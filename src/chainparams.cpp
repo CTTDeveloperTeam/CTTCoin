@@ -101,6 +101,7 @@ public:
         nTargetSpacing = 1 * 60;  // CryptoInvest: 1 minute
         nLastPOWBlock = 2000;
         nMaturity = 60;
+		nStakeInputMinimal = 10 * COIN;
         nModifierUpdateBlock = 1;
 		
         const char* pszTimestamp = "Official Release";

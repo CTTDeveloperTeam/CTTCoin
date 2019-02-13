@@ -3158,7 +3158,44 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i].IsCoinStake())
                 return state.DoS(100, error("CheckBlock() : more than one coinstake"));
-    }
+	
+        //check for minimal stake input after fork
+        CBlockIndex* pindex = NULL;
+        CTransaction txPrev;
+    	uint256 hashBlockPrev = block.hashPrevBlock;
+        BlockMap::iterator it = mapBlockIndex.find(hashBlockPrev);
+        if (it != mapBlockIndex.end())
+            pindex = it->second;
+    	else
+            return state.DoS(100, error("CheckBlock() : stake failed to find block index"));
+        if (pindex->nHeight > LIMIT_POS_FORK_HEIGHT) {
+            if (!GetTransaction(block.vtx[1].vin[0].prevout.hash, txPrev, hashBlockPrev, true))
+      		return state.DoS(100, error("CheckBlock() : stake failed to find vin transaction"));
+            if (txPrev.vout[block.vtx[1].vin[0].prevout.n].nValue < Params().StakeInputMinimal())
+                return state.DoS(100, error("CheckBlock() : stake input below minimum value"));
+        }
+/*
+        //additional check against false PoS attack
+    		// Check for coin age.
+    		// First try finding the previous transaction in database.
+    		if (!GetTransaction(block.vtx[1].vin[0].prevout.hash, txPrev, hashBlockPrev, true))
+    			return state.DoS(100, error("CheckBlock() : stake failed to find vin transaction"));
+    		// Find block in map.
+    		CBlockIndex* pindex = NULL;
+    		BlockMap::iterator it = mapBlockIndex.find(hashBlockPrev);
+    		if (it != mapBlockIndex.end())
+    			pindex = it->second;
+    		else
+    			return state.DoS(100, error("CheckBlock() :  stake failed to find block index"));
+    		// Check block time vs stake age requirement.
+    		if (pindex->GetBlockHeader().nTime + StakeMinAge() > GetAdjustedTime())
+    			return state.DoS(100, error("CheckBlock() : stake under min. stake age"));
+    		// Check that the prev. stake block has required confirmations by height.
+    		LogPrintf("CheckBlock() : height=%d stake_tx_height=%d required_confirmations=%d got=%d\n", chainActive.Tip()->nHeight, pindex->nHeight, STAKE_MIN_CONF, chainActive.Tip()->nHeight - pindex->nHeight);
+    		if (chainActive.Tip()->nHeight - pindex->nHeight < STAKE_MIN_CONF)
+    			return state.DoS(100, error("CheckBlock() : stake under min. required confirmations"));
+*/
+}
 
     // ----------- swiftTX transaction scanning -----------
 
@@ -5381,12 +5418,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
 int ActiveProtocol()
 {
-    if (IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
-        if (chainActive.Tip()->nHeight >= Params().ModifierUpgradeBlock())
-            return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
-    }
-
-    return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
+    	if(chainActive.Height() >= LIMIT_POS_FORK_HEIGHT)
+        return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
+    else
+		return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
 }
 
 // requires LOCK(cs_vRecvMsg)
