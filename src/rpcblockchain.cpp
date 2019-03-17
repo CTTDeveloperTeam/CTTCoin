@@ -79,6 +79,10 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDe
     result.push_back(Pair("bits", strprintf("%08x", block.nBits)));
     result.push_back(Pair("difficulty", GetDifficulty(blockindex)));
     result.push_back(Pair("chainwork", blockindex->nChainWork.GetHex()));
+	result.push_back(Pair("modifier", strprintf("%s", blockindex->nStakeModifier)));
+    result.push_back(Pair("modifierchecksum", strprintf("%08x", blockindex->nStakeModifierChecksum)));
+
+
 
     if (blockindex->pprev)
         result.push_back(Pair("previousblockhash", blockindex->pprev->GetBlockHash().GetHex()));

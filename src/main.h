@@ -52,6 +52,18 @@ class CValidationState;
 struct CBlockTemplate;
 struct CNodeStateStats;
 
+inline int64_t GetMstrNodCollateral(int nHeight)
+{
+    if(nHeight < 110000)
+    {
+        return 1000;
+    } 
+    else
+    {
+        return 5000;   
+    }
+}
+
 /** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/
 static const unsigned int DEFAULT_BLOCK_MAX_SIZE = 750000;
 static const unsigned int DEFAULT_BLOCK_MIN_SIZE = 0;
@@ -100,8 +112,9 @@ static const unsigned int DATABASE_WRITE_INTERVAL = 3600;
 /** Maximum length of reject messages. */
 static const unsigned int MAX_REJECT_MESSAGE_LENGTH = 111;
 
-
 static const bool DEFAULT_PEERBLOOMFILTERS = true;
+
+
 /** "reject" message codes */
 static const unsigned char REJECT_MALFORMED = 0x01;
 static const unsigned char REJECT_INVALID = 0x10;

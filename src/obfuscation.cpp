@@ -47,7 +47,12 @@ CActiveMasternode activeMasternode;
 void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
+	
+	if (IsSporkActive(SPORK_15_LOCK_OBFS)) return;
+	
     if (!masternodeSync.IsBlockchainSynced()) return;
+	
+	if (IsSporkActive(SPORK_15_LOCK_OBFS)) return;
 
     if (strCommand == "dsa") { //Obfuscation Accept Into Pool
 
@@ -2110,7 +2115,7 @@ bool CObfuScationSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey)
     uint256 hash;
     if (GetTransaction(vin.prevout.hash, txVin, hash, true)) {
         BOOST_FOREACH (CTxOut out, txVin.vout) {
-            if (out.nValue == 1000 * COIN) {
+            if (out.nValue == GetMstrNodCollateral(chainActive.Height()) * COIN) {
                 if (out.scriptPubKey == payee2) return true;
             }
         }
